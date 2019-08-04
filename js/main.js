@@ -1,8 +1,31 @@
-// global variables
+// constants
+
+
+// State variables
 const board, winner, reset;
 
-//Initializing the board
+//Functions
 function init() {
-    board = new.Array(64).fill(null);
+    board = [
+        [0, 1, "X", "X", 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, "X", 1],
+        [0, 0, 0, 0, 0, 1, 1, 1],
+        [0, 0, 0, 1, "X", 1, 1, 0],
+        [0, 0, 0, 1, "X", "X", 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, "X", 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, "X", 1, 0, 0],
+    ]
     winner = null;
+    render();
+}
+
+function render() {
+    board.forEach(function(strip, indx) {
+        strip.forEach(function(tile, idx) {
+            
+        })
+        
+    });
+
 }
