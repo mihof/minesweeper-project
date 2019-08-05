@@ -9,12 +9,12 @@ init();
 function init() {
     board = new Array(64).fill("X", 0, 10, null);
     winner = null;
+    shuffle(board);
     console.log(board);
-    console.log(shuffle());
     //render();
 }
 
-function shuffle() {
+function shuffle(board) {
     //Shuffle the board (Durstenfeld Shuffle)
     for (let i = board.length -1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -22,7 +22,8 @@ function shuffle() {
     }
 }
 
-function dimensionArr() {
+
+function dimensionArr(list, SubArr) {
     //Turns board into a 2D array
     board = [], i, k;
 
