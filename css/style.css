@@ -9,9 +9,19 @@ body {
     align-items: center;
 }
 
+button:focus {
+    outline:0;
+}
+
 .controls {
-    justify-content: space-evenly;
+    display: flex;
+    justify-content: space-between;
     background-color: lightgray;
+    width: 24vmin;
+}
+
+h6 {
+    margin-left: 20px;
 }
 
 section.board {
