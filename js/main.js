@@ -99,28 +99,48 @@ function reveal(row, column, index) {
 }
 
 function splash(row, column, index) {
-    const tile = document.getElementById(`tile${index}`)
+    const tile = document.getElementById(`tile${index}`);
     if (board[row][column].value === 0) {
         tile.style.backgroundColor = '#bababa';
-        board[row][column].hidden = !board[row][column].hidden;
-        for (let i = 0; i < 2; i++) {
-            for (let j = 0; j < 2; j++) {
-                let tile = !(i == 0 && j == 0) && row - i >= 0 && row + i < 8 && column - j >= 0 && column + j < 8;
-                if (tile && board[row + i][column + j].value === 0) {
-                    splash(row + i, column + j, row * 8 + column);
-                } else {
-                    if (board[row][column].value > 0) {
-                        tile.style.backgroundColor = '#bababa';
-                        board[row][column].hidden = !board[row][column].hidden;
+        if (board[row][column].hidden) {
+            board[row][column].hidden = !board[row][column].hidden;
+        }
+        for (let i = -1; i < 2; i++) {
+            for (let j = -1; j < 2; j++) {
+                let isConnected = !(i == 0 && j == 0) && row + i >= 0 && row + i < 8 && column + j >= 0 && column + j < 8;
+                let borderIndex = row * 8 + column;
+                if (isConnected && board[row + i][column + j].value === 0) {
+                    splash(row + i, column + j, borderIndex);
+                } else if (isConnected) {
+                    if (board[row + i][column + j].value !== 'X' && board[row + i][column + j].value > 0) {
+                        document.getElementById(`tile${borderIndex}`).style.backgroundColor = '#bababa';
+                        document.getElementById(`tile${borderIndex}`).innerHTML = board[row + i][column + j].value;
+                        if (board[row + i][column + j].hidden) {
+                            board[row + i][column + j].hidden = !board[row + i][column + j].hidden;
+                        }
                     }
                 }
             }
         }
     } else {
-        tile.style.backgroundColor = '#bababa';
-        board[row][column].hidden = !board[row][column].hidden;
         tile.innerHTML = board[row][column].value;
+        tile.style.backgroundColor = '#bababa';
+        if (board[row][column].hidden) {
+            board[row][column].hidden = !board[row][column].hidden;
+        }
     }
+}
+
+function debug() {
+    let line = '';
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            line += board[i][j].value;
+        }
+        console.log(line);
+        line = '';
+    }
+    console.log('\n');
 }
 
 function handleClick(index) {
@@ -129,6 +149,7 @@ function handleClick(index) {
         if (gameOver) {
             return;
         }
+        debug();
         if (event.button == 0) {
             const row = Math.floor(index / 8);
             const column = index % 8;
