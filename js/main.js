@@ -53,8 +53,8 @@ function layMines() {
 }
 
 function setNumbers() {
-    for (let i = 0; i < board.length - 1; i++) {
-        for (let j = 0; j < board[i].length - 1; j++) {
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
             if (board[i][j].value === 'X') {
                 for (let k = -1; k < 2; k++) {
                     for (let l = -1; l < 2; l++) {
@@ -70,13 +70,22 @@ function setNumbers() {
 }
 
 function win() {
-  // board.forEach(board[i][j].value === 'X' && board[i][j].flag === true) [
-  //    alert('Congratulations, you win!');
-  // gameOver = true;
+    let hidden = 0;
+    for (let i = 0; i < board.length; i++) {
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j].hidden) {
+                hidden++;
+            }
+        }
+    }
+    if (hidden === NUM_MINES) {
+        alert('Congratulations, you win!');
+        gameOver = true;
+    }
 }
 
 function reset() {
-    return (event) => {
+    return () => {
         init();
         for (let i = 0; i < 64; i++) {
             const tile = document.getElementById(`tile${i}`)
@@ -87,72 +96,46 @@ function reset() {
 }
 
 function reveal(row, column, index) {
-    board[row][column].hidden = !board[row][column].hidden;
     const tile = document.getElementById(`tile${index}`);
     if (board[row][column].value !== 0) {
         tile.innerHTML = board[row][column].value;
+        board[row][column].hidden = false;
     } else {
         splash(row, column, index);
     }
     tile.style.backgroundColor = '#bababa';
-
 }
 
 function splash(row, column, index) {
+    if (row < 0 || row > 7 || column < 0 || column > 7 || index < 0 || index > 63 || !board[row][column].hidden) {
+        return;
+    }
     const tile = document.getElementById(`tile${index}`);
     if (board[row][column].value === 0) {
         tile.style.backgroundColor = '#bababa';
-        if (board[row][column].hidden) {
-            board[row][column].hidden = !board[row][column].hidden;
-        }
+        board[row][column].hidden = false;
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
-                let isConnected = !(i == 0 && j == 0) && row + i >= 0 && row + i < 8 && column + j >= 0 && column + j < 8;
-                let borderIndex = row * 8 + column;
-                if (isConnected && board[row + i][column + j].value === 0) {
-                    splash(row + i, column + j, borderIndex);
-                } else if (isConnected) {
-                    if (board[row + i][column + j].value !== 'X' && board[row + i][column + j].value > 0) {
-                        document.getElementById(`tile${borderIndex}`).style.backgroundColor = '#bababa';
-                        document.getElementById(`tile${borderIndex}`).innerHTML = board[row + i][column + j].value;
-                        if (board[row + i][column + j].hidden) {
-                            board[row + i][column + j].hidden = !board[row + i][column + j].hidden;
-                        }
-                    }
-                }
+                let borderIndex = (row + i) * 8 + column + j;
+                splash(row + i, column + j, borderIndex);
             }
         }
-    } else {
+    } else if (board[row][column].value !== 'X') {
         tile.innerHTML = board[row][column].value;
         tile.style.backgroundColor = '#bababa';
-        if (board[row][column].hidden) {
-            board[row][column].hidden = !board[row][column].hidden;
-        }
+        board[row][column].hidden = false;
     }
-}
-
-function debug() {
-    let line = '';
-    for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            line += board[i][j].value;
-        }
-        console.log(line);
-        line = '';
-    }
-    console.log('\n');
 }
 
 function handleClick(index) {
     return (event) => {
+        const row = Math.floor(index / 8);
+        const column = index % 8;
         event.preventDefault();
         if (gameOver) {
             return;
         }
-        debug();
-        if (event.button == 0) {
-            const row = Math.floor(index / 8);
-            const column = index % 8;
+        if (event.button == 0 && !board[row][column].flag) {
             if (board[row][column].hidden) {
                 reveal(row, column, index);
             }
@@ -160,8 +143,12 @@ function handleClick(index) {
                     gameOver = true;
                     alert('Game Over');
             }
-        } else if (event.button == 2) {
+            win();
+        } else if (event.button == 2 && board[row][column].hidden) {
             board[row][column].flag = !board[row][column].flag;
+            board[row][column].flag 
+                ? document.getElementById(`tile${index}`).style.backgroundColor = '#FF0000'
+                : document.getElementById(`tile${index}`).style.backgroundColor = null;
         }
     }
 }
